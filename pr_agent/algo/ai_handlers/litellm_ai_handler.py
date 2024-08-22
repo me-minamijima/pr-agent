@@ -104,6 +104,12 @@ class LiteLLMAIHandler(BaseAiHandler):
         try:
             resp, finish_reason = None, None
             deployment_id = self.deployment_id
+            get_logger().warning(deployment_id)
+            get_logger().warning(model)
+            get_logger().warning(system)
+            get_logger().warning(user)
+            get_logger().warning(temperature)
+            get_logger().warning(img_path)
             if self.azure:
                 model = 'azure/' + model
             if 'claude' in model and not system:
@@ -115,6 +121,7 @@ class LiteLLMAIHandler(BaseAiHandler):
                 try:
                     # check if the image link is alive
                     r = requests.head(img_path, allow_redirects=True)
+                    get_logger().warning(r)
                     if r.status_code == 404:
                         error_msg = f"The image link is not [alive](img_path).\nPlease repost the original image as a comment, and send the question again with 'quote reply' (see [instructions](https://pr-agent-docs.codium.ai/tools/ask/#ask-on-images-using-the-pr-code-as-context))."
                         get_logger().error(error_msg)
@@ -150,9 +157,9 @@ class LiteLLMAIHandler(BaseAiHandler):
                 get_logger().info(f"\nUser prompt:\n{user}")
 
             response = await acompletion(**kwargs)
-        except (openai.APIError, openai.APITimeoutError) as e:
-            get_logger().warning("Error during OpenAI inference: ", e)
-            raise
+        #except (openai.APIError, openai.APITimeoutError) as e:
+        #    get_logger().warning("Error during OpenAI inference: ", e)
+        #    raise
         except (openai.RateLimitError) as e:
             get_logger().error("Rate limit error during OpenAI inference: ", e)
             raise
